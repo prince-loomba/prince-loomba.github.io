@@ -96,6 +96,10 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+imageContainer.addEventListener('click', () => {
+    changeImage(1)
+});
+
 // Handle dropdown change
 chapterSelect.addEventListener('change', (event) => loadChapter(event.target.value));
 chapterSelect.addEventListener('keydown', (event) => event.preventDefault());
