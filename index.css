@@ -40,7 +40,7 @@ img {
     justify-content: center;
     gap: 10px; /* Reduced gap between buttons */
     margin-top: 10px;
-    max-height: 3vh;
+    max-height: 10px;
     align-items: center;
 }
 
