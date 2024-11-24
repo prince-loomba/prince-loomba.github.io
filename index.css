@@ -1,0 +1,95 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+    font-family: Arial, sans-serif;
+}
+
+img {
+    display: block;
+    width: 650px;
+    max-width: 100vw; /* Ensure the image does not exceed 100% of the viewport width */
+    height: 90vh;
+    object-fit: fill;
+    margin: 20px auto;
+    border: 2px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#chapter-select {
+    margin: 10px;
+    padding: 5px;
+    font-size: 1.2em;
+    height: 45px;
+    background: transparent;
+    border: none;
+    color: black;
+    text-align: center;
+    font-family: inherit;
+}
+
+#chapter-select:focus {
+    outline: none;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    max-height: 3vh;
+    align-items: center;
+}
+
+#prev-chapter, #next-chapter {
+    background-color: transparent;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 10px;
+}
+
+#prev-chapter:hover, #next-chapter:hover {
+    color: #b21f1f;
+    transform: scale(1.1);
+}
+
+.back-to-top {
+    background-color: transparent;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-size: 2em;
+    padding: 10px;
+}
+
+.back-to-top:hover {
+    color: #b21f1f;
+    transform: scale(1.1); /* Slight scale on hover */
+}
+
+.image-nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.image-nav-buttons button {
+    background-color: transparent;
+    color: black;
+    border: 2px solid #ddd;
+    padding: 10px;
+    font-size: 2em;
+    cursor: pointer;
+    max-height: 3vh;
+}
+
+.image-nav-buttons button:hover {
+    color: #b21f1f;
+    transform: scale(1.1);
+}
