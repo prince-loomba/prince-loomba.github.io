@@ -13,18 +13,15 @@
             justify-content: center;
             margin: 0;
             background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
-            /* Dark blue gradient */
             font-family: Arial, sans-serif;
         }
 
         img {
             display: block;
             width: 650px;
-            /* Limit max width to 1000px */
+            max-width: 100vw; /* Ensure the image does not exceed 100% of the viewport width */
             height: 90vh;
-            /* 80% of the viewport height */
             object-fit: fill;
-            /* Ensure the image covers the container without distortion */
             margin: 20px auto;
             border: 2px solid #ddd;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -36,22 +33,20 @@
             font-size: 1.2em;
             height: 45px;
             background: transparent;
-            /* Remove background */
             border: none;
-            /* Remove border */
             color: black;
-            /* Black text color */
             text-align: center;
-            /* Center the text */
             font-family: inherit;
-            /* Inherit font family from body */
-            pointer-events: none;
-            /* Disable cursor interaction */
+            pointer-events: none; /* Disabled by default */
+        }
+
+        #chapter-select[disabled] {
+            background-color: #ddd;
+            color: #666;
         }
 
         #chapter-select:focus {
             outline: none;
-            /* Remove focus outline */
         }
 
         .nav-buttons {
@@ -63,30 +58,27 @@
             align-items: center;
         }
 
-        /* Move back-to-top button beside the Next Chapter button */
         .back-to-top {
             background-color: transparent;
             color: black;
             border: none;
             cursor: pointer;
             font-size: 2em;
-            /* Increase font size */
             padding: 10px;
-            /* Add some padding to make the button larger */
         }
 
         .back-to-top:hover {
             color: #b21f1f;
+            transform: scale(1.1); /* Slight scale on hover */
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Font Awesome for icons -->
 </head>
 
 <body>
     <div class="nav-buttons">
         <select id="chapter-select"></select>
-        <button id="back-to-top" class="back-to-top"><i class="fas fa-arrow-up"></i></button> <!-- Back to top icon -->
+        <button id="back-to-top" class="back-to-top"><i class="fas fa-arrow-up"></i></button>
     </div>
     <div id="image-container"></div>
 
@@ -141,7 +133,6 @@
             currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0; // Default to 0 if no saved index
 
             loadImage();
-            // Store the current chapter in localStorage
             localStorage.setItem('currentChapter', currentChapter);
         }
 
@@ -152,42 +143,36 @@
             // Update image index based on direction (1 for next, -1 for previous)
             currentImageIndex += direction;
 
-            // If we're at the last image of the current chapter
+            // Prevent going out of bounds for images
             if (currentImageIndex >= chapterImages.length) {
-                // Reset to the first image of the next chapter
-                currentImageIndex = 0;
-
-                // If there's a next chapter, load it, else stay on the last chapter
+                currentImageIndex = 0; // Loop back to the first image
                 if (chapters[currentChapter + 1]) {
-                    loadChapter(currentChapter + 1);
+                    loadChapter(currentChapter + 1); // Move to the next chapter
                 }
             }
 
-            // If we're at the first image, prevent going below 0
             if (currentImageIndex < 0) {
-                currentImageIndex = 0;
+                currentImageIndex = 0; // Prevent negative index
             }
 
             loadImage();
-
-            // Store the updated image index for the current chapter
             localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex);
         }
 
         // Handle key events for chapter and image navigation
         document.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowLeft') {
-                // Left arrow key: Move to the previous chapter
-                loadChapter(currentChapter - 1);
+                if (currentChapter > 1) {
+                    loadChapter(currentChapter - 1); // Move to previous chapter
+                }
             } else if (event.key === 'ArrowRight') {
-                // Right arrow key: Move to the next chapter
-                loadChapter(currentChapter + 1);
+                if (chapters[currentChapter + 1]) {
+                    loadChapter(currentChapter + 1); // Move to next chapter
+                }
             } else if (event.key === 'ArrowUp') {
-                // Up arrow key: Move to the previous image
-                changeImage(-1);
+                changeImage(-1); // Move to previous image
             } else if (event.key === 'ArrowDown') {
-                // Down arrow key: Move to the next image or next chapter (first image of next chapter)
-                changeImage(1);
+                changeImage(1); // Move to next image or next chapter
             }
         });
 
@@ -197,20 +182,19 @@
 
         // Handle Back to Top button click
         backToTopBtn.addEventListener('click', () => {
-            currentImageIndex = 0; // Reset to first image
-            loadImage(); // Load the first image of the current chapter
-            localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex); // Store the index
+            currentImageIndex = 0;
+            loadImage();
+            localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex);
         });
 
         // Initialize
         function initialize() {
-            // Retrieve the saved chapter and image index from localStorage
             const savedChapter = localStorage.getItem('currentChapter');
             const savedImageIndex = localStorage.getItem(`currentImageIndex_${savedChapter}`);
 
-            if (savedChapter && savedImageIndex !== null) {
+            if (savedChapter && chapters[savedChapter]) {
                 currentChapter = parseInt(savedChapter);
-                currentImageIndex = parseInt(savedImageIndex);
+                currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0;
             }
 
             populateChapterDropdown();
@@ -219,7 +203,6 @@
 
         // Initialize on page load
         initialize();
-
     </script>
 </body>
 
