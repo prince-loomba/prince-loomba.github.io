@@ -7,20 +7,36 @@
     <title>TBATE</title>
     <link rel="stylesheet" href="index.css">
     <script type="module" src="index.js" defer></script>
+    <!-- Add Font Awesome CDN for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
     <div class="nav-buttons">
-        <button id="prev-chapter" class="back-to-top"><i class="fas fa-chevron-left"></i> Previous Chapter</button>
-        <select id="chapter-select"></select>
-        <button id="back-to-top" class="back-to-top"><i class="fas fa-arrow-up"></i></button>
-        <button id="next-chapter" class="back-to-top">Next Chapter <i class="fas fa-chevron-right"></i></button>
+        <!-- Previous Chapter Button -->
+        <button id="prev-chapter" class="nav-btn">
+            <i class="fa-solid fa-arrow-left"></i> <!-- Double Back Arrow Icon -->
+        </button>
+        <!-- Previous Image Button -->
+        <button id="prev-image" class="nav-btn">
+            <i class="fas fa-chevron-left"></i> <!-- Back Arrow Icon -->
+        </button>
+        <!-- Chapter Select Dropdown -->
+        <select id="chapter-select" class="nav-btn"></select>
+        <!-- Next Image Button -->
+        <button id="next-image" class="nav-btn">
+            <i class="fas fa-chevron-right"></i> <!-- Next Image Arrow Icon -->
+        </button>
+        <!-- Next Chapter Button -->
+        <button id="next-chapter" class="nav-btn">
+            <i class="fa-solid fa-arrow-right"></i> <!-- Double Forward Arrow Icon -->
+        </button>
+        <!-- Back to Top Button -->
+        <button id="back-to-top" class="nav-btn">
+            <i class="fas fa-arrow-up"></i> <!-- Up Arrow Icon -->
+        </button>
     </div>
     <div id="image-container"></div>
-    <div class="image-nav-buttons">
-        <button id="prev-image"><i class="fas fa-chevron-left"></i></button>
-        <button id="next-image"><i class="fas fa-chevron-right"></i></button>
-    </div>
 </body>
 
 </html>
