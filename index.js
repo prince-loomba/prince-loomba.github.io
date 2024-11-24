@@ -1,14 +1,12 @@
 import chapters from './sample.js';
+
 const imageContainer = document.getElementById('image-container');
 const chapterSelect = document.getElementById('chapter-select');
-const backToTopBtn = document.getElementById('back-to-top');
-const prevImageBtn = document.getElementById('prev-image');
-const nextImageBtn = document.getElementById('next-image');
+const backToTopButton = document.getElementById('back-to-top');
 const prevChapterBtn = document.getElementById('prev-chapter');
 const nextChapterBtn = document.getElementById('next-chapter');
 
 let currentChapter = 1;
-let currentImageIndex = 0;
 
 // Function to populate chapter dropdown
 function populateChapterDropdown() {
@@ -24,19 +22,22 @@ function populateChapterDropdown() {
     chapterSelect.disabled = false; // Enable dropdown after population
 }
 
-// Function to load a specific image for the current chapter
-function loadImage() {
+// Function to load all images for the current chapter
+function loadImages() {
     const chapterImages = chapters[currentChapter];
 
     if (!chapterImages || chapterImages.length === 0) {
         return;
     }
 
-    imageContainer.innerHTML = '';
+    imageContainer.innerHTML = ''; // Clear any existing images
 
-    const img = document.createElement('img');
-    img.src = chapterImages[currentImageIndex];
-    imageContainer.appendChild(img);
+    // Loop through the chapter images and add them to the container
+    chapterImages.forEach(imageSrc => {
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        imageContainer.appendChild(img);
+    });
 }
 
 // Function to load chapters based on URL or chapter selection
@@ -48,38 +49,11 @@ function loadChapter(chapter) {
     currentChapter = chapter;
     chapterSelect.value = chapter;
 
-    // Retrieve the saved image index for this chapter
-    const savedImageIndex = localStorage.getItem(`currentImageIndex_${chapter}`);
-    currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0; // Default to 0 if no saved index
-
-    loadImage();
+    loadImages(); // Load all images for the current chapter
     localStorage.setItem('currentChapter', currentChapter);
 
     // Update URL with the current chapter
     updateURL(chapter);
-}
-
-// Function to change the image
-function changeImage(direction) {
-    const chapterImages = chapters[currentChapter];
-
-    // Update image index based on direction (1 for next, -1 for previous)
-    currentImageIndex += direction;
-
-    // Prevent going out of bounds for images
-    if (currentImageIndex >= chapterImages.length) {
-        currentImageIndex = 0; // Loop back to the first image
-        if (chapters[currentChapter + 1]) {
-            loadChapter(currentChapter + 1); // Move to the next chapter
-        }
-    }
-
-    if (currentImageIndex < 0) {
-        currentImageIndex = 0; // Prevent negative index
-    }
-
-    loadImage();
-    localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex);
 }
 
 // Function to update URL with the current chapter
@@ -89,55 +63,52 @@ function updateURL(chapter) {
     window.history.pushState({}, '', url); // Update the URL without reloading the page
 }
 
-// Handle key events for chapter and image navigation
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft') {
-        if (currentChapter > 1) {
-            loadChapter(currentChapter - 1); // Move to previous chapter
-        }
-    } else if (event.key === 'ArrowRight') {
-        if (chapters[currentChapter + 1]) {
-            loadChapter(currentChapter + 1); // Move to next chapter
-        }
-    } else if (event.key === 'ArrowUp') {
-        changeImage(-1); // Move to previous image
-    } else if (event.key === 'ArrowDown') {
-        changeImage(1); // Move to next image or next chapter
-    }
-});
-
-imageContainer.addEventListener('click', () => {
-    changeImage(1); // Move to next image on click
-});
-
 // Handle dropdown change
 chapterSelect.addEventListener('change', (event) => loadChapter(event.target.value));
 chapterSelect.addEventListener('keydown', (event) => event.preventDefault());
 
-// Handle Back to Top button click
-backToTopBtn.addEventListener('click', () => {
-    currentImageIndex = 0;
-    loadImage();
-    localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex);
-});
+// Show the button when the user scrolls down 300px from the top of the document
+window.onscroll = function() {
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        backToTopButton.classList.add('show');
+    } else {
+        backToTopButton.classList.remove('show');
+    }
+};
 
-// Handle Previous Image button click
-prevImageBtn.addEventListener('click', () => changeImage(-1));
+// Scroll the page to the top when the button is clicked
+backToTopButton.onclick = function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
-// Handle Next Image button click
-nextImageBtn.addEventListener('click', () => changeImage(1));
-
-// Handle Previous Chapter button click
+// Handle Previous Chapter Button Click
 prevChapterBtn.addEventListener('click', () => {
     if (currentChapter > 1) {
-        loadChapter(currentChapter - 1); // Move to previous chapter
+        loadChapter(currentChapter - 1);
     }
 });
 
-// Handle Next Chapter button click
+// Handle Next Chapter Button Click
 nextChapterBtn.addEventListener('click', () => {
-    if (chapters[currentChapter + 1]) {
-        loadChapter(currentChapter + 1); // Move to next chapter
+    const totalChapters = Object.keys(chapters).length;
+    if (currentChapter < totalChapters) {
+        loadChapter(currentChapter + 1);
+    }
+});
+
+// Handle Keydown Events for Left and Right Arrow Keys
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+        // Left arrow key pressed: Previous chapter
+        if (currentChapter > 1) {
+            loadChapter(currentChapter - 1);
+        }
+    } else if (event.key === 'ArrowRight') {
+        // Right arrow key pressed: Next chapter
+        const totalChapters = Object.keys(chapters).length;
+        if (currentChapter < totalChapters) {
+            loadChapter(currentChapter + 1);
+        }
     }
 });
 
@@ -148,10 +119,8 @@ function initialize() {
 
     // Load chapter from URL if available, otherwise default to chapter 1
     const savedChapter = chapterFromURL && chapters[chapterFromURL] ? chapterFromURL : localStorage.getItem('currentChapter') || 1;
-    const savedImageIndex = localStorage.getItem(`currentImageIndex_${savedChapter}`);
 
     currentChapter = parseInt(savedChapter);
-    currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0;
 
     populateChapterDropdown();
     loadChapter(currentChapter);
