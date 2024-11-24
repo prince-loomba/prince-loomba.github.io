@@ -39,7 +39,7 @@ function loadImage() {
     imageContainer.appendChild(img);
 }
 
-// Function to load images for the current chapter
+// Function to load chapters based on URL or chapter selection
 function loadChapter(chapter) {
     if (!chapters[chapter]) {
         return;
@@ -54,9 +54,12 @@ function loadChapter(chapter) {
 
     loadImage();
     localStorage.setItem('currentChapter', currentChapter);
+
+    // Update URL with the current chapter
+    updateURL(chapter);
 }
 
-// Function to change image
+// Function to change the image
 function changeImage(direction) {
     const chapterImages = chapters[currentChapter];
 
@@ -79,6 +82,13 @@ function changeImage(direction) {
     localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex);
 }
 
+// Function to update URL with the current chapter
+function updateURL(chapter) {
+    const url = new URL(window.location);
+    url.searchParams.set('chapter', chapter); // Set or update 'chapter' parameter
+    window.history.pushState({}, '', url); // Update the URL without reloading the page
+}
+
 // Handle key events for chapter and image navigation
 document.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft') {
@@ -97,7 +107,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 imageContainer.addEventListener('click', () => {
-    changeImage(1)
+    changeImage(1); // Move to next image on click
 });
 
 // Handle dropdown change
@@ -133,13 +143,15 @@ nextChapterBtn.addEventListener('click', () => {
 
 // Initialize
 function initialize() {
-    const savedChapter = localStorage.getItem('currentChapter');
+    const urlParams = new URLSearchParams(window.location.search);
+    const chapterFromURL = urlParams.get('chapter');
+
+    // Load chapter from URL if available, otherwise default to chapter 1
+    const savedChapter = chapterFromURL && chapters[chapterFromURL] ? chapterFromURL : localStorage.getItem('currentChapter') || 1;
     const savedImageIndex = localStorage.getItem(`currentImageIndex_${savedChapter}`);
 
-    if (savedChapter && chapters[savedChapter]) {
-        currentChapter = parseInt(savedChapter);
-        currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0;
-    }
+    currentChapter = parseInt(savedChapter);
+    currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0;
 
     populateChapterDropdown();
     loadChapter(currentChapter);
