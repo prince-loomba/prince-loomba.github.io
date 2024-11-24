@@ -1,9 +1,226 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <title>NGNL</title>
-  </head>
-  <body>
-    <h1>No game no life</h1>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBATE</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+            /* Dark blue gradient */
+            font-family: Arial, sans-serif;
+        }
+
+        img {
+            display: block;
+            width: 650px;
+            /* Limit max width to 1000px */
+            height: 90vh;
+            /* 80% of the viewport height */
+            object-fit: fill;
+            /* Ensure the image covers the container without distortion */
+            margin: 20px auto;
+            border: 2px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #chapter-select {
+            margin: 10px;
+            padding: 5px;
+            font-size: 1.2em;
+            height: 45px;
+            background: transparent;
+            /* Remove background */
+            border: none;
+            /* Remove border */
+            color: black;
+            /* Black text color */
+            text-align: center;
+            /* Center the text */
+            font-family: inherit;
+            /* Inherit font family from body */
+            pointer-events: none;
+            /* Disable cursor interaction */
+        }
+
+        #chapter-select:focus {
+            outline: none;
+            /* Remove focus outline */
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            max-height: 5vh;
+            align-items: center;
+        }
+
+        /* Move back-to-top button beside the Next Chapter button */
+        .back-to-top {
+            background-color: transparent;
+            color: black;
+            border: none;
+            cursor: pointer;
+            font-size: 2em;
+            /* Increase font size */
+            padding: 10px;
+            /* Add some padding to make the button larger */
+        }
+
+        .back-to-top:hover {
+            color: #b21f1f;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Font Awesome for icons -->
+</head>
+
+<body>
+    <div class="nav-buttons">
+        <select id="chapter-select"></select>
+        <button id="back-to-top" class="back-to-top"><i class="fas fa-arrow-up"></i></button> <!-- Back to top icon -->
+    </div>
+    <div id="image-container"></div>
+
+    <script type="module">
+        import chapters from './sample.js';
+        const imageContainer = document.getElementById('image-container');
+        const chapterSelect = document.getElementById('chapter-select');
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        let currentChapter = 1;
+        let currentImageIndex = 0;
+
+        // Function to populate chapter dropdown
+        function populateChapterDropdown() {
+            chapterSelect.innerHTML = ''; // Clear existing options
+            Object.keys(chapters).forEach((chapter) => {
+                const option = document.createElement('option');
+                option.value = chapter;
+                option.textContent = `Chapter ${chapter}`;
+                chapterSelect.appendChild(option);
+            });
+
+            chapterSelect.value = currentChapter;
+        }
+
+        // Function to load a specific image for the current chapter
+        function loadImage() {
+            const chapterImages = chapters[currentChapter];
+
+            if (!chapterImages || chapterImages.length === 0) {
+                return;
+            }
+
+            imageContainer.innerHTML = '';
+
+            const img = document.createElement('img');
+            img.src = chapterImages[currentImageIndex];
+            imageContainer.appendChild(img);
+        }
+
+        // Function to load images for the current chapter
+        function loadChapter(chapter) {
+            if (!chapters[chapter]) {
+                return;
+            }
+
+            currentChapter = chapter;
+            chapterSelect.value = chapter;
+
+            // Retrieve the saved image index for this chapter
+            const savedImageIndex = localStorage.getItem(`currentImageIndex_${chapter}`);
+            currentImageIndex = savedImageIndex ? parseInt(savedImageIndex) : 0; // Default to 0 if no saved index
+
+            loadImage();
+            // Store the current chapter in localStorage
+            localStorage.setItem('currentChapter', currentChapter);
+        }
+
+        // Function to change image
+        function changeImage(direction) {
+            const chapterImages = chapters[currentChapter];
+
+            // Update image index based on direction (1 for next, -1 for previous)
+            currentImageIndex += direction;
+
+            // If we're at the last image of the current chapter
+            if (currentImageIndex >= chapterImages.length) {
+                // Reset to the first image of the next chapter
+                currentImageIndex = 0;
+
+                // If there's a next chapter, load it, else stay on the last chapter
+                if (chapters[currentChapter + 1]) {
+                    loadChapter(currentChapter + 1);
+                }
+            }
+
+            // If we're at the first image, prevent going below 0
+            if (currentImageIndex < 0) {
+                currentImageIndex = 0;
+            }
+
+            loadImage();
+
+            // Store the updated image index for the current chapter
+            localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex);
+        }
+
+        // Handle key events for chapter and image navigation
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                // Left arrow key: Move to the previous chapter
+                loadChapter(currentChapter - 1);
+            } else if (event.key === 'ArrowRight') {
+                // Right arrow key: Move to the next chapter
+                loadChapter(currentChapter + 1);
+            } else if (event.key === 'ArrowUp') {
+                // Up arrow key: Move to the previous image
+                changeImage(-1);
+            } else if (event.key === 'ArrowDown') {
+                // Down arrow key: Move to the next image or next chapter (first image of next chapter)
+                changeImage(1);
+            }
+        });
+
+        // Handle dropdown change
+        chapterSelect.addEventListener('change', (event) => loadChapter(event.target.value));
+        chapterSelect.addEventListener('keydown', (event) => event.preventDefault());
+
+        // Handle Back to Top button click
+        backToTopBtn.addEventListener('click', () => {
+            currentImageIndex = 0; // Reset to first image
+            loadImage(); // Load the first image of the current chapter
+            localStorage.setItem(`currentImageIndex_${currentChapter}`, currentImageIndex); // Store the index
+        });
+
+        // Initialize
+        function initialize() {
+            // Retrieve the saved chapter and image index from localStorage
+            const savedChapter = localStorage.getItem('currentChapter');
+            const savedImageIndex = localStorage.getItem(`currentImageIndex_${savedChapter}`);
+
+            if (savedChapter && savedImageIndex !== null) {
+                currentChapter = parseInt(savedChapter);
+                currentImageIndex = parseInt(savedImageIndex);
+            }
+
+            populateChapterDropdown();
+            loadChapter(currentChapter);
+        }
+
+        // Initialize on page load
+        initialize();
+
+    </script>
+</body>
+
 </html>
