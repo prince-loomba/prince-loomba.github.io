@@ -40,7 +40,8 @@ img {
     justify-content: center;
     align-items: center;
     gap: 10px; /* Maximum gap between buttons */
-    margin-top: 10px;
+    margin-top: 15px;
+    max-height: 25px;
     width: 100%; /* Full width to adjust to screen size */
     overflow: hidden; /* Hide overflow if the content exceeds */
 }
