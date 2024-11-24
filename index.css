@@ -62,35 +62,11 @@ button i {
     font-size: 1.5em; /* Ensures icons are properly scaled */
 }
 
-/* Styling for Back to Top button */
-#back-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #28a745;
-    font-size: 1.5em;
-    padding: 12px;
-    border-radius: 50%;
-    color: white;
-    display: none; /* Initially hidden */
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#back-to-top:hover {
-    background-color: #218838;
-}
-
 /* Icon Sizes for Navigation Buttons */
 .nav-btn i {
     font-size: 1.5em;
 }
 
-/* Hide the button if not needed */
 #back-to-top {
-    display: none; /* Initially hidden, only shown after scrolling down */
-}
-
-#back-to-top.show {
     display: block; /* Display when 'show' class is added */
 }
