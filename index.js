@@ -54,6 +54,10 @@ function loadChapter(chapter) {
 
     // Update URL with the current chapter
     updateURL(chapter);
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth", // Smooth scrolling for better UX
+    });
 }
 
 // Function to update URL with the current chapter
