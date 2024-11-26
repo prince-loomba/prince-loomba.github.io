@@ -112,6 +112,36 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+let lastScrollTop = window.scrollY;
+const navBar = document.querySelector('.nav-buttons');
+let scrollTimeout;
+
+// Ensure the nav bar is visible initially
+navBar.classList.add('visible');
+
+// Add scroll event listener
+window.addEventListener('scroll', () => {
+    const currentScroll = window.scrollY;
+
+    if (currentScroll < lastScrollTop) {
+        // Scrolling up
+        navBar.classList.add('visible');
+    } else if (currentScroll > lastScrollTop) {
+        // Scrolling down
+        navBar.classList.remove('visible');
+    }
+
+    // Keep the nav bar visible briefly after scrolling
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        if (window.scrollY !== 0) {
+            navBar.classList.remove('visible');
+        }
+    }, 2000); // Visible for 2 seconds after scroll
+
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // Prevent negative scroll
+});
+
 // Initialize
 function initialize() {
     const urlParams = new URLSearchParams(window.location.search);
