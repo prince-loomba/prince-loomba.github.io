@@ -31,10 +31,10 @@ const Navbar = ({ chapters, currentChapter, onNext, onPrevious, onChapterChange 
 
     return (
         <div className={`nav-buttons ${visible ? 'visible' : 'hidden'}`}>
-            <button 
-                id="prev-chapter" 
-                className="nav-btn" 
-                onClick={onPrevious} 
+            <button
+                id="prev-chapter"
+                className="nav-btn"
+                onClick={onPrevious}
                 disabled={currentChapter <= 1}
             >
                 <i className="fa-solid fa-arrow-left"></i>
@@ -54,10 +54,10 @@ const Navbar = ({ chapters, currentChapter, onNext, onPrevious, onChapterChange 
                 ))}
             </select>
 
-            <button 
-                id="next-chapter" 
-                className="nav-btn" 
-                onClick={onNext} 
+            <button
+                id="next-chapter"
+                className="nav-btn"
+                onClick={onNext}
                 disabled={currentChapter >= Object.keys(chapters).length}
             >
                 <i className="fa-solid fa-arrow-right"></i>

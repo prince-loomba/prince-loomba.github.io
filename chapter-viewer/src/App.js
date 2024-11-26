@@ -9,7 +9,7 @@ let scrollTimeout;
 
 // Add scroll event listener
 window.addEventListener('scroll', () => {
-  const navBar = document.querySelector('.nav-buttons');
+    const navBar = document.querySelector('.nav-buttons');
 
     const currentScroll = window.scrollY;
 
