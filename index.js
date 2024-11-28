@@ -105,23 +105,42 @@ nextChapterBtn.addEventListener('click', () => {
 // Debounce flag to prevent rapid chapter navigation
 let isNavigating = false;
 
-// Handle left and right arrow key navigation
+// Handle key navigation and scrolling
 document.addEventListener('keydown', (event) => {
-    if (isNavigating) return; // Ignore if debounce is active
-
     const totalChapters = Object.keys(chapters).length;
 
-    if (event.key === 'ArrowLeft' && currentChapter > 1) {
-        isNavigating = true; // Activate debounce
-        loadChapter(currentChapter - 1);
-    } else if (event.key === 'ArrowRight' && currentChapter < totalChapters) {
-        isNavigating = true; // Activate debounce
-        loadChapter(currentChapter + 1);
+    // Handle chapter navigation
+    if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !isNavigating) {
+        event.preventDefault(); // Prevent default scrolling behavior for left/right keys
+
+        if (event.key === 'ArrowLeft' && currentChapter > 1) {
+            isNavigating = true; // Activate debounce
+            loadChapter(currentChapter - 1);
+        } else if (event.key === 'ArrowRight' && currentChapter < totalChapters) {
+            isNavigating = true; // Activate debounce
+            loadChapter(currentChapter + 1);
+        }
+
+        // Clear debounce after 300ms
+        setTimeout(() => (isNavigating = false), 300);
     }
 
-    // Clear debounce after 300ms
-    setTimeout(() => (isNavigating = false), 300);
+    // Handle page scrolling for up and down keys
+    if (event.key === 'ArrowUp') {
+        event.preventDefault(); // Prevent default behavior (jump scrolling)
+        window.scrollBy({
+            top: -100, // Scroll up by 100px
+            behavior: 'smooth',
+        });
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault(); // Prevent default behavior (jump scrolling)
+        window.scrollBy({
+            top: 100, // Scroll down by 100px
+            behavior: 'smooth',
+        });
+    }
 });
+
 
 
 // Handle visibility of the navigation bar on scroll
