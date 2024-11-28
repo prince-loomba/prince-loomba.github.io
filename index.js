@@ -124,24 +124,41 @@ document.addEventListener('keydown', (event) => {
         // Clear debounce after 300ms
         setTimeout(() => (isNavigating = false), 300);
     }
+});
 
-    // Handle page scrolling for up and down keys
-    if (event.key === 'ArrowUp') {
-        event.preventDefault(); // Prevent default behavior (jump scrolling)
+let scrolling = false; // Flag to track whether scrolling is active
+let scrollDirection = 0; // Direction: -1 for up, 1 for down
+let scrollSpeed = 20; // Pixels to scroll per frame (adjust for speed)
+
+// Function to handle continuous scrolling
+function continuousScroll() {
+    if (scrolling) {
         window.scrollBy({
-            top: -100, // Scroll up by 100px
-            behavior: 'smooth',
+            top: scrollDirection * scrollSpeed,
+            behavior: 'auto', // Instant scrolling for continuous updates
         });
-    } else if (event.key === 'ArrowDown') {
-        event.preventDefault(); // Prevent default behavior (jump scrolling)
-        window.scrollBy({
-            top: 100, // Scroll down by 100px
-            behavior: 'smooth',
-        });
+        requestAnimationFrame(continuousScroll); // Repeat the scrolling action
+    }
+}
+
+// Event listener for keydown (start scrolling)
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault(); // Prevent default behavior
+        if (!scrolling) {
+            scrolling = true;
+            scrollDirection = event.key === 'ArrowUp' ? -1 : 1;
+            continuousScroll(); // Start scrolling
+        }
     }
 });
 
-
+// Event listener for keyup (stop scrolling)
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        scrolling = false; // Stop scrolling
+    }
+});
 
 // Handle visibility of the navigation bar on scroll
 let lastScrollTop = window.scrollY;
