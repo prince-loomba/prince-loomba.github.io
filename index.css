@@ -59,6 +59,11 @@ body {
     color: inherit; /* Inherit text color from parent */
 }
 
+/* Change background color for dropdown */
+#chapter-select option {
+    background-color: black;
+}
+
 /* Hover effect for buttons and dropdown */
 .nav-buttons button:hover,
 #prev-chapter:hover,

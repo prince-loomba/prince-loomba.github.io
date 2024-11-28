@@ -8,7 +8,7 @@ const nextChapterBtn = document.getElementById('next-chapter');
 
 let currentChapter = 1;
 
-// Function to populate chapter dropdown
+// Populate the chapter dropdown
 function populateChapterDropdown() {
     chapterSelect.innerHTML = ''; // Clear existing options
     Object.keys(chapters).forEach((chapter) => {
@@ -22,57 +22,59 @@ function populateChapterDropdown() {
     chapterSelect.disabled = false; // Enable dropdown after population
 }
 
-// Function to load all images for the current chapter
+// Load all images for the current chapter
 function loadImages() {
     const chapterImages = chapters[currentChapter];
 
     if (!chapterImages || chapterImages.length === 0) {
+        console.error(`No images found for Chapter ${currentChapter}`);
+        imageContainer.innerHTML = '<p>No images available for this chapter.</p>';
         return;
     }
 
     imageContainer.innerHTML = ''; // Clear any existing images
-
-    // Loop through the chapter images and add them to the container
     chapterImages.forEach(imageSrc => {
         const img = document.createElement('img');
         img.src = imageSrc;
+        img.alt = `Chapter ${currentChapter} Image`;
+        img.loading = 'lazy'; // Improve performance
         imageContainer.appendChild(img);
     });
 }
 
-// Function to load chapters based on URL or chapter selection
+// Load a chapter based on input
 function loadChapter(chapter) {
+    chapter = parseInt(chapter, 10); // Ensure chapter is a number
     if (!chapters[chapter]) {
+        console.error(`Invalid Chapter: ${chapter}`);
         return;
     }
 
     currentChapter = chapter;
     chapterSelect.value = chapter;
 
-    loadImages(); // Load all images for the current chapter
-    localStorage.setItem('currentChapter', currentChapter);
-
-    // Update URL with the current chapter
+    loadImages(); // Load images for the selected chapter
+    localStorage.setItem('currentChapter', currentChapter); // Save progress
     updateURL(chapter);
+
     window.scrollTo({
         top: 0,
         behavior: "smooth", // Smooth scrolling for better UX
     });
 }
 
-// Function to update URL with the current chapter
+// Update the URL to reflect the current chapter
 function updateURL(chapter) {
     const url = new URL(window.location);
-    url.searchParams.set('chapter', chapter); // Set or update 'chapter' parameter
-    window.history.pushState({}, '', url); // Update the URL without reloading the page
+    url.searchParams.set('chapter', chapter);
+    window.history.pushState({}, '', url);
 }
 
-// Handle dropdown change
+// Event: Handle chapter dropdown change
 chapterSelect.addEventListener('change', (event) => loadChapter(event.target.value));
-chapterSelect.addEventListener('keydown', (event) => event.preventDefault());
 
-// Show the button when the user scrolls down 300px from the top of the document
-window.onscroll = function() {
+// Event: Show or hide the back-to-top button
+window.onscroll = function () {
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
         backToTopButton.classList.add('show');
     } else {
@@ -80,19 +82,19 @@ window.onscroll = function() {
     }
 };
 
-// Scroll the page to the top when the button is clicked
-backToTopButton.onclick = function() {
+// Event: Scroll to top on back-to-top button click
+backToTopButton.onclick = function () {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Handle Previous Chapter Button Click
+// Event: Handle previous chapter button click
 prevChapterBtn.addEventListener('click', () => {
     if (currentChapter > 1) {
         loadChapter(currentChapter - 1);
     }
 });
 
-// Handle Next Chapter Button Click
+// Event: Handle next chapter button click
 nextChapterBtn.addEventListener('click', () => {
     const totalChapters = Object.keys(chapters).length;
     if (currentChapter < totalChapters) {
@@ -100,22 +102,29 @@ nextChapterBtn.addEventListener('click', () => {
     }
 });
 
-// Handle Keydown Events for Left and Right Arrow Keys
+// Debounce flag to prevent rapid chapter navigation
+let isNavigating = false;
+
+// Handle left and right arrow key navigation
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft') {
-        // Left arrow key pressed: Previous chapter
-        if (currentChapter > 1) {
-            loadChapter(currentChapter - 1);
-        }
-    } else if (event.key === 'ArrowRight') {
-        // Right arrow key pressed: Next chapter
-        const totalChapters = Object.keys(chapters).length;
-        if (currentChapter < totalChapters) {
-            loadChapter(currentChapter + 1);
-        }
+    if (isNavigating) return; // Ignore if debounce is active
+
+    const totalChapters = Object.keys(chapters).length;
+
+    if (event.key === 'ArrowLeft' && currentChapter > 1) {
+        isNavigating = true; // Activate debounce
+        loadChapter(currentChapter - 1);
+    } else if (event.key === 'ArrowRight' && currentChapter < totalChapters) {
+        isNavigating = true; // Activate debounce
+        loadChapter(currentChapter + 1);
     }
+
+    // Clear debounce after 300ms
+    setTimeout(() => (isNavigating = false), 300);
 });
 
+
+// Handle visibility of the navigation bar on scroll
 let lastScrollTop = window.scrollY;
 const navBar = document.querySelector('.nav-buttons');
 let scrollTimeout;
@@ -123,7 +132,7 @@ let scrollTimeout;
 // Ensure the nav bar is visible initially
 navBar.classList.add('visible');
 
-// Add scroll event listener
+// Add scroll event listener for nav bar visibility
 window.addEventListener('scroll', () => {
     const currentScroll = window.scrollY;
 
@@ -135,7 +144,7 @@ window.addEventListener('scroll', () => {
         navBar.classList.remove('visible');
     }
 
-    // Keep the nav bar visible briefly after scrolling
+    // Keep the nav bar visible briefly after scrolling stops
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
         if (window.scrollY !== 0) {
@@ -143,18 +152,18 @@ window.addEventListener('scroll', () => {
         }
     }, 2000); // Visible for 2 seconds after scroll
 
-    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // Prevent negative scroll
+    lastScrollTop = Math.max(currentScroll, 0); // Prevent negative scroll
 });
 
-// Initialize
+// Initialize the script
 function initialize() {
     const urlParams = new URLSearchParams(window.location.search);
     const chapterFromURL = urlParams.get('chapter');
 
-    // Load chapter from URL if available, otherwise default to chapter 1
+    // Load chapter from URL if valid, else fallback to saved or default chapter
     const savedChapter = chapterFromURL && chapters[chapterFromURL] ? chapterFromURL : localStorage.getItem('currentChapter') || 1;
 
-    currentChapter = parseInt(savedChapter);
+    currentChapter = parseInt(savedChapter, 10);
 
     populateChapterDropdown();
     loadChapter(currentChapter);
