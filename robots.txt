@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://prince-loomba.github.io/sitemap.xml
